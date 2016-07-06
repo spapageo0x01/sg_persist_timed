@@ -397,8 +397,8 @@ prin_work(int sg_fd, const struct opts_t * op)
     res = sg_ll_persistent_reserve_in(sg_fd, op->prin_sa, pr_buff,
                                       op->alloc_len, 1, op->verbose);
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-    duration = end.tv_sec - start.tv_sec + ((double)(end.tv_nsec - start.tv_nsec) / 1000000000L);
-    printf("Time: %f sec\n", duration);
+    duration = ((end.tv_sec - start.tv_sec) * 1000L) + ((double)(end.tv_nsec - start.tv_nsec) / 1000000L);
+    printf("Time: %f msec\n", duration);
     if (res) {
         char b[64];
         char bb[80];
@@ -642,8 +642,8 @@ prout_work(int sg_fd, struct opts_t * op)
                                        op->prout_type, pr_buff, len, 1,
                                        op->verbose);
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-    duration = end.tv_sec - start.tv_sec + ((double)(end.tv_nsec - start.tv_nsec) / 1000000000L);
-    printf(">>Time: %f sec\n", duration);
+    duration = ((end.tv_sec - start.tv_sec) * 1000L) + ((double)(end.tv_nsec - start.tv_nsec) / 1000000L);
+    printf(">>Time: %f msec\n", duration);
 
     if (res || op->verbose) {
         if (op->prout_sa < num_prout_sa_strs)
@@ -676,8 +676,6 @@ prout_reg_move_work(int sg_fd, struct opts_t * op)
     uint64_t param_sark;
     struct timespec start, end;
     double duration = 0;
-
-
 
     t_arr_len = compact_transportid_array(op);
     param_rk = op->param_rk;
@@ -712,8 +710,8 @@ prout_reg_move_work(int sg_fd, struct opts_t * op)
                                        op->prout_type, pr_buff, len, 1,
                                        op->verbose);
     clock_gettime(CLOCK_MONOTONIC_RAW, &end);
-    duration = end.tv_sec - start.tv_sec + ((double)(end.tv_nsec - start.tv_nsec) / 1000000000L);
-    printf("Time: %f sec\n", duration);
+    duration = ((end.tv_sec - start.tv_sec) * 1000L) + ((double)(end.tv_nsec - start.tv_nsec) / 1000000L);
+    printf("Time: %f msec\n", duration);
     if (res) {
        if (SG_LIB_CAT_INVALID_OP == res)
             pr2serr("PR out (register and move): command not supported\n");
