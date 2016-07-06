@@ -388,15 +388,17 @@ prin_work(int sg_fd, const struct opts_t * op)
     uint64_t ull;
     unsigned char * ucp;
     unsigned char pr_buff[MX_ALLOC_LEN];
-    struct timeval start, end;
+    struct timespec start, end;
+    double duration = 0;
 
     memset(pr_buff, 0, sizeof(pr_buff));
 
-    gettimeofday(&start, NULL);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     res = sg_ll_persistent_reserve_in(sg_fd, op->prin_sa, pr_buff,
                                       op->alloc_len, 1, op->verbose);
-    gettimeofday(&end, NULL);
-    printf("Time: %ld microseconds\n", ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    duration = end.tv_sec - start.tv_sec + ((double)(end.tv_nsec - start.tv_nsec) / 1000000000L);
+    printf("Time: %f sec\n", duration);
     if (res) {
         char b[64];
         char bb[80];
@@ -603,7 +605,8 @@ prout_work(int sg_fd, struct opts_t * op)
     unsigned char pr_buff[MX_ALLOC_LEN];
     uint64_t param_rk;
     uint64_t param_sark;
-    struct timeval start, end;
+    struct timespec start, end;
+    double duration = 0;
     char b[64];
     char bb[80];
 
@@ -634,12 +637,13 @@ prout_work(int sg_fd, struct opts_t * op)
         pr_buff[27] = (unsigned char)(t_arr_len & 0xff);
     }
     
-    gettimeofday(&start, NULL);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     res = sg_ll_persistent_reserve_out(sg_fd, op->prout_sa, 0,
                                        op->prout_type, pr_buff, len, 1,
                                        op->verbose);
-    gettimeofday(&end, NULL);
-    printf(">>Time: %ld microseconds\n", ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    duration = end.tv_sec - start.tv_sec + ((double)(end.tv_nsec - start.tv_nsec) / 1000000000L);
+    printf(">>Time: %f sec\n", duration);
 
     if (res || op->verbose) {
         if (op->prout_sa < num_prout_sa_strs)
@@ -670,7 +674,9 @@ prout_reg_move_work(int sg_fd, struct opts_t * op)
     unsigned char pr_buff[MX_ALLOC_LEN];
     uint64_t param_rk;
     uint64_t param_sark;
-    struct timeval start, end;
+    struct timespec start, end;
+    double duration = 0;
+
 
 
     t_arr_len = compact_transportid_array(op);
@@ -701,12 +707,13 @@ prout_reg_move_work(int sg_fd, struct opts_t * op)
         pr_buff[23] = (unsigned char)(t_arr_len & 0xff);
     }
 
-    gettimeofday(&start, NULL);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     res = sg_ll_persistent_reserve_out(sg_fd, PROUT_REG_MOVE_SA, 0,
                                        op->prout_type, pr_buff, len, 1,
                                        op->verbose);
-    gettimeofday(&end, NULL);
-    printf("Time: %ld microseconds\n", ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    duration = end.tv_sec - start.tv_sec + ((double)(end.tv_nsec - start.tv_nsec) / 1000000000L);
+    printf("Time: %f sec\n", duration);
     if (res) {
        if (SG_LIB_CAT_INVALID_OP == res)
             pr2serr("PR out (register and move): command not supported\n");
